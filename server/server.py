@@ -58,7 +58,7 @@ class TCPThreadedServer():
             while True:
                 client, addr = self.mSocket.accept()
                 clientRecv, clientRecv_addr = self.mSocket.accept()
-                client.settimeout(60)
+                # client.settimeout(60)
 
                 t = threading.Thread(target=self.clientHandler, args=(client, clientRecv, addr))
                 t.start()
@@ -119,7 +119,7 @@ class TCPThreadedServer():
                     if newPrice > self.items[itemname][0]:
                         if self.items[itemname][1]:
                             prevUsername = self.items[itemname][1]
-                            sendDataStream(clientRecv, encrypt(f"Someone has higher bid than you on: {itemname}".encode(), self.userPubkeys[prevUsername]))
+                            sendDataStream(self.activeUsers[prevUsername], encrypt(f"Someone has higher bid than you on: {itemname}".encode(), self.userPubkeys[prevUsername]))
 
                         self.items[itemname] = [newPrice, username]
                         sendAck(clientMain, 1)
