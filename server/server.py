@@ -77,6 +77,9 @@ class TCPThreadedServer():
             sendDataStream(clientMain, serverPubkey)
             username = recvDataStream(clientMain).decode().strip()
             
+            sendAck(clientMain, 1 if not username in self.activeUsers.keys() else 0)
+
+
             if username in self.userDB.keys():
                 sendAck(clientMain, 0)
                 while True:

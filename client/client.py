@@ -50,8 +50,12 @@ class TCPThreadedClient():
         mainSock = self.mainSock
         try:
             serverPubkey = recvDataStream(mainSock)
-
             sendDataStream(mainSock, args.username)
+            
+            alreadyLogin = recvAck(mainSock)
+            if alreadyLogin == 0:
+                raise Exception("User already logged in...")
+
             usrExistAck = recvAck(mainSock)
             if usrExistAck != 1:
                 while True:
