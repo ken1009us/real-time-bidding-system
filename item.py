@@ -17,6 +17,7 @@ class Item():
             self.price = newPrice
             self.prevUsername = self.username
             self.username = newUsername
+            self.priceChangeTime = time.time()
             return True
         else:
             return False
