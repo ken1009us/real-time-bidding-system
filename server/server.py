@@ -5,6 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 from utils import *
 from pglib import *
 
+from item import *
 
 USR_DBFN = "users.txt"
 
@@ -14,7 +15,7 @@ class TCPThreadedServer():
         self.PORT = args.port
         self.SOCK_ADDR = (self.HOST, self.PORT)
 
-        self.items: Dict[str, Tuple[int, str]] = {"car": [100, None], "pen": [200, None]}
+        self.items: Dict[str, Item] = {"car": Item(100), "pen": Item(200)}
 
         try:
             self.mSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -109,6 +110,8 @@ class TCPThreadedServer():
                     break
 
                 elif op == "BID":
+                    sendDataStream(clientMain, json.dumps(self.getBiddableItems()))
+
                     itemname = recvDataStream(clientMain).decode()
                     if itemname in self.items:
                         sendAck(clientMain, 1)
@@ -116,22 +119,64 @@ class TCPThreadedServer():
                         sendAck(clientMain, 0)
                         continue
                     newPrice = int(recvDataStream(clientMain).decode())
-                    if newPrice > self.items[itemname][0]:
-                        if self.items[itemname][1]:
-                            prevUsername = self.items[itemname][1]
-                            sendDataStream(self.activeUsers[prevUsername], encrypt(f"Someone has higher bid than you on: {itemname}".encode(), self.userPubkeys[prevUsername]))
 
-                        self.items[itemname] = [newPrice, username]
-                        sendAck(clientMain, 1)
-                    else:
-                        sendAck(clientMain, 0)
+                    result = self.items[itemname].change_priceAndOwner(newPrice, username)
+                    sendAck(clientMain, 1 if result else 0)
+                    
                 
                 elif op == "GETALL":
-                    sendDataStream(clientMain, json.dumps(self.items))
+                    items = self.transformItems()
+                    sendDataStream(clientMain, json.dumps(items))
+
+                elif op == "AUCT":
+                    while True:
+                        itemname = recvDataStream(clientMain).decode()
+                        if itemname not in self.items.keys():
+                            sendAck(clientMain, 1)
+                            break
+                        sendAck(clientMain, 0)
+
+                    try:
+                        itemprice = int(recvDataStream(clientMain).decode())
+                        self.items[itemname] = Item(itemprice, username)
+                        sendAck(clientMain, 1)
+                    except Exception as e:
+                        print(e)
+                        sendAck(clientMain, 0)
+                        continue
+
+
+                    for k, v in self.activeUsers.items():
+                        sendDataStream(v, encrypt(f"New item in auction: {itemname}".encode(), 
+                                                self.userPubkeys[k]))
+                    
 
         except Exception as e: 
             print(f"[ERROR] error occurs for user: {username}\n", e)
+
+
+
+
+    def transformItems(self):
+        tmp = {}
+        for k in self.items.keys():
+            tmp[k] = {}
+            v = self.items[k]
+            tmp[k]["price"] = v.price
+            tmp[k]["owner"] = v.username
+            tmp[k]["isBiddable"] = v.isBiddable()
+        return tmp
+
     
+    def getBiddableItems(self):
+        tmp = {}
+        for k in self.items.keys():
+            v = self.items[k]
+            if v.isBiddable():
+                tmp[k] = {}
+                tmp[k]["price"] = v.price
+                tmp[k]["username"] = v.username
+        return tmp
 
 
     

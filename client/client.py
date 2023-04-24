@@ -78,6 +78,10 @@ class TCPThreadedClient():
                     break
                 
                 elif op == "BID":
+                    biddable = json.loads(recvDataStream(mainSock).decode())
+                    print("Biddable Items:\n", biddable)
+
+
                     itemname = input("What item you want to bid on: ")
                     sendDataStream(mainSock, itemname.encode())
                     itemnameAck = recvAck(mainSock)
@@ -86,25 +90,42 @@ class TCPThreadedClient():
                         continue
                     newPrice = input("How much money: ")
                     sendDataStream(mainSock, str(newPrice))
+
                     newPriceAck = recvAck(mainSock)
-                    if newPriceAck == 1:
-                        print("Successful")
-                    else:
-                        print("New price too low")
-                        continue
+                    print("Successful" if newPriceAck==1 else "Unsuccessful. Time collision or price too low")
 
                 elif op == "GETALL":
                     data = json.loads(recvDataStream(mainSock).decode())
                     print(data)
 
+                elif op == "AUCT": # sell something
+                    while True:
+                        itemname = input("Give a unique item name: ")
+                        sendDataStream(mainSock, itemname)
+                        if recvAck(mainSock) == 1 : break
+
+                    while True:
+                        price = input("Give a starting price: ")
+                        try:
+                            _ = int(price)
+                            break
+                        except:
+                            print("Enter number (integer)")
+                            continue
+                    sendDataStream(mainSock, price)
+                    print("Successful" if recvAck(mainSock) == 1 else "Unsuccessful")
+
+
         except Exception as e:
             print(e)
             sendDataStream(mainSock, "EX")
             mainSock.close()
+            self.recvSock.close()
         except KeyboardInterrupt as e:
             print("[INFO] Shutting down connection manually...")
             sendDataStream(mainSock, "EX")
             mainSock.close()
+            self.recvSock.close()
 
         
 
