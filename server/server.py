@@ -97,7 +97,7 @@ class TCPThreadedServer():
                 self.userDB[username] = received_pw
                 with open(USR_DBFN, "a") as f:
                     f.write(f"{username} {received_pw}\n")
-            sendDataStream(clientMain, f"Hello, {username}")
+            sendDataStream(clientMain, f"Hello, {username}. Please enter your command (BID - Bid item, AUCT - Create new item, GETALL - Get auction info, EX - Exit):")
 
             self.activeUsers[username] = clientRecv
             self.userPubkeys[username] = recvDataStream(clientMain)

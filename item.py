@@ -1,7 +1,7 @@
 import time
 
 class Item():
-    def __init__(self, price, username=None, timer=20) -> None:
+    def __init__(self, price, username=None, timer=180) -> None:
         self.startTime = time.time()
         self.price = price
         self.priceChangeTime = self.startTime
