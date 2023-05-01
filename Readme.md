@@ -97,7 +97,7 @@ This command allows the user to create a new auction item. The user would be ask
 
 
 ####GETALL: 
-This command allows the user to retrieve information about all the auction items currently in the database. Each items has the information of 
+This command allows the user to retrieve information about all the auction items currently in the database. Each items has the information of current price, current owner(highest bid), and whether the item is biddable. 
 
 ####EX: 
 This command allows the user to exit or quit the bidding interface. On receiving the operation, the server closes the socket descriptor for the client. This ensures proper termination of the communication and releases the resources used by the client and server.
