@@ -45,7 +45,7 @@ Bidding System client that takes in:
 - The user name of the client (argument 3).
 
 ```shell
-YOUR_NET_ID@is-student00:~$ /YOUR_PATH/python3 chatclient.py -hn [HOST_NAME] -p [PORT_NUMBER] -un [USER_NAME]
+YOUR_NET_ID@is-student00:~$ /YOUR_PATH/python3 client.py -hn [HOST_NAME] -p [PORT_NUMBER] -un [USER_NAME]
 ```
 
 Bidding System server that takes in:
@@ -69,7 +69,7 @@ Then the terminal will show the messages below:
 Run the socket client program.
 
 ```shell
-YOUR_TEAM_MEMBER_NET_ID@is-student01:~$ /YOUR_PATH/python3 client.py -hn [SERVER_HOST_NAME] -p [PORT_NUMBER]
+YOUR_TEAM_MEMBER_NET_ID@is-student01:~$ /YOUR_PATH/python3 client.py -hn [SERVER_HOST_NAME] -p [PORT_NUMBER] -un [USER_NAME]
 ```
 
 Then the server terminal will show the messages based on New User or Existing User:
